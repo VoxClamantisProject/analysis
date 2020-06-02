@@ -94,27 +94,27 @@ vowelValues <- function(dataset, measure) {
 # get all correlations of means between vowel pairs
 getCors <- function(vowel_values, count_cutoff) {
 	x <- vowel_values
-	x <- cor(x[,-1], use="pairwise.complete.obs")
+	x <- cor(x[,-1], use = "pairwise.complete.obs")
 	x <- reshape2::melt(x)
-	names(x) <- c("vowel.x","vowel.y","value")
+	names(x) <- c("vowel.x", "vowel.y", "value")
 
 	# create dataset with vowel pair cors and counts
-	x <- merge(x, vowelCooccur, by=c('vowel.x','vowel.y'))
+	x <- merge(x, vowelCooccur, by = c("vowel.x", "vowel.y"))
 	
 	# get rid of NAs (where a vowel pair occurs only once)
 	x <- na.omit(x)
 	
 	# keep only pairs with some minimum number of readings
-	x <- subset(x, count > count_cutoff & vowel.x!=vowel.y)
+	x <- subset(x, count > count_cutoff & vowel.x != vowel.y)
 	
 	# rearrange by correlation magnitude and get rid of duplicates
-	x <- x[order(x$value, decreasing=T),]
-	x$keep <- rep(c("TRUE","FALSE"), nrow(x)/2)
+	x <- x[order(x$value, decreasing = T),]
+	x$keep <- rep(c("TRUE", "FALSE"), nrow(x) / 2)
 	x <- subset(x, keep=="TRUE")
 	x$keep <- NULL
 	
 	# rearrange by correlation count
-	x <- x[order(x$count, decreasing=T),]
+	x <- x[order(x$count, decreasing = T),]
 	return(x)
 }
 
@@ -135,7 +135,7 @@ getPvals <- function(corTable, vowel_values) {
 
 # make correlation table nice for publication / latex
 latexCors <- function(x, cutoff) {
-	x <- subset(x, vowel.x!="4")
+	x <- subset(x, vowel.x != "4")
 	x$vowel.x <- paste0("phon{", x$vowel.x, "}")
 	x$vowel.y <- paste0("phon{", x$vowel.y, "}")
 	x$value <- round(x$value, 2)
@@ -150,11 +150,11 @@ latexCors <- function(x, cutoff) {
 prepFigure <- function(dataset_with_means, vowel_values, sd_measure, vowel1, vowel2) {
 	x0 <- vowel_values
 	x0.sd <- dataset_with_means %>% select(c(lang, vowel, {{sd_measure}})) %>% spread(vowel, {{sd_measure}})
-	x <-cbind(x0[,colnames(x0)%in%c('lang', vowel1,vowel2)], x0.sd[,colnames(x0.sd) %in% c('lang',vowel1, vowel2)])
-	names(x) <- c('lang',vowel1,vowel2, 'lang2', paste0("sd", "_", vowel1,), paste0("sd", "_", vowel2))
+	x <-cbind(x0[,colnames(x0) %in% c("lang", vowel1, vowel2)], x0.sd[,colnames(x0.sd) %in% c("lang", vowel1, vowel2)])
+	names(x) <- c("lang", vowel1, vowel2, "lang2", paste0("sd", "_", vowel1), paste0("sd", "_", vowel2))
 	x$lang2 <- NULL
 	x <- data.frame(x)
-	x <- merge(x, inventory, by ="lang")
+	x <- merge(x, inventory, by = "lang")
 	x$MCD <- x$MCD1
 	return(x)
 }
@@ -165,33 +165,33 @@ makeFigure <- function(prep_figure_data, label1, label2, corInfo, uniformityFigu
 	y <- prep_figure_data[,3]
 	sd_x <- prep_figure_data[,4]
 	sd_y <- prep_figure_data[,5]
-	minX <- round(min(x, na.rm=T))
-	maxX <- ceiling(max(x, na.rm=T))
-	minY <- round(min(y, na.rm=T))
-	maxY <- ceiling(max(y, na.rm=T))
+	minX <- round(min(x, na.rm = T))
+	maxX <- ceiling(max(x, na.rm = T))
+	minY <- round(min(y, na.rm = T))
+	maxY <- ceiling(max(y, na.rm = T))
 
 	if (uniformityFigure==TRUE) {
 		minX <- minY <- min(minX, minY)
 		maxX <- maxY <- max(maxX, maxY)
 	}
 	
-	diffX <- maxX-minX
-	diffY <- maxY-minY
+	diffX <- maxX - minX
+	diffY <- maxY - minY
 	
 	p <- ggplot(prep_figure_data, aes(x, y)) + geom_point(color = "white", fill = "white", size = 0) + 
-		geom_ellipse(aes(x0 = x, y0 = y, a = sd_x*0.1, b = sd_y*0.1, angle = 0), 
+		geom_ellipse(aes(x0 = x, y0 = y, a = sd_x * 0.1, b = sd_y * 0.1, angle = 0), 
 		color = "slategray", fill = "slategray", alpha = 0.04) + 
 		geom_smooth(method = lm, size = 0.75, se = TRUE, color = "black") + 
 		geom_abline(slope = 1, intercept = 0, linetype = "dashed", alpha = 0.4) + 
 		theme_few(20) + xlab("ERB") + ylab("ERB") + 
-		scale_x_continuous(limit = c(minX,maxX)) + scale_y_continuous(limit = c(minY,maxY)) + 
-		annotate("text", family="serif", x = minX + 0.8*diffX, y = minY, size = 7, label = corInfo, fontface = "italic") + 
-		annotate("text", family="serif", x = minX + (diffX/2), y = maxY, size = 9, label = label1) + 
-		annotate("text", family="serif", x = maxX, y = minY + (diffY/2), size = 9, label = label2, angle=-90) + 
-		theme(text=element_text(family="serif", size=22))
+		scale_x_continuous(limit = c(minX, maxX)) + scale_y_continuous(limit = c(minY, maxY)) + 
+		annotate("text", family = "serif", x = minX + 0.8 * diffX, y = minY, size = 7, label = corInfo, fontface = "italic") + 
+		annotate("text", family = "serif", x = minX + (diffX / 2), y = maxY, size = 9, label = label1) + 
+		annotate("text", family = "serif", x = maxX, y = minY + (diffY / 2), size = 9, label = label2, angle = -90) + 
+		theme(text = element_text(family = "serif", size = 22))
 
-	ggMarginal(p, type="histogram", xparams = list(colour="slategray", fill="ghostwhite"), 
-	yparams = list(colour="ghostwhite", fill="slategray"))
+	ggMarginal(p, type = "histogram", xparams = list(color = "slategray", fill = "ghostwhite"), 
+	yparams = list(color = "ghostwhite", fill = "slategray"))
 }
 
 
@@ -199,9 +199,9 @@ makeFigure <- function(prep_figure_data, label1, label2, corInfo, uniformityFigu
 ######## READ IN DATA ########
 ##############################
 
-epi_list <- list.files(path=epiDir, pattern="*_mid.csv")
-wiki_list <- list.files(path=wikiDir, pattern="*_mid.csv")
-scores_list <- list.files(path=scoresDir, pattern="*.scores")
+epi_list <- list.files(path = epiDir, pattern = "*_mid.csv")
+wiki_list <- list.files(path = wikiDir, pattern = "*_mid.csv")
+scores_list <- list.files(path = scoresDir, pattern = "*.scores")
 
 # READ IN PER-UTT-MCD SCORES
 
@@ -243,10 +243,10 @@ for (i in 1:length(langDFs)) {
   	langDFs[[langID]]$erbF2 <- hz2erb(langDFs[[langID]]$f2_mid)
 
   	# merge formants with utterance-level scores
-  	langDFs[[langID]] <- left_join(langDFs[[langID]], scores[[langID]], by=c("file"="file"))
+  	langDFs[[langID]] <- left_join(langDFs[[langID]], scores[[langID]], by = c("file" = "file"))
   	
   	# merge formants with wilderness inventory data (reading_info.csv)
-    langDFs[[langID]] <- left_join(langDFs[[langID]], inventory, by="lang")
+    langDFs[[langID]] <- left_join(langDFs[[langID]], inventory, by = "lang")
 }
 
 # get rid of vowel length which is non-contrastive in URDWTC labeling
@@ -273,14 +273,14 @@ for (i in 1:length(removeme)) {
 
 # count remaining vowels
 count <- getNumVowels(langDFs, "file_mcd")
-numVowels <- left_join(numVowels, count, by="lang") 
+numVowels <- left_join(numVowels, count, by = "lang") 
 
 # remove utterances below mcd cutoff
-langDFs <- lapply(langDFs, removeUttMcd, cutoff=6)
+langDFs <- lapply(langDFs, removeUttMcd, cutoff = 6)
 
 # count remaining vowels
 count <- getNumVowels(langDFs, "utt_mcd")
-numVowels <- left_join(numVowels, count, by="lang") 
+numVowels <- left_join(numVowels, count, by = "lang") 
 
 # get rid of non vowels (Unitran only)
 #langDFs <- lapply(langDFs, removeNonVowels)
@@ -290,19 +290,19 @@ vowelInfo <- list()
 
 for (i in 1:length(langDFs)) {
   	vowelInfo[[i]] <- langDFs[[i]] %>% group_by(vowel) %>% summarise(
-  	meanf1 = mean(erbF1, na.rm=T), sdf1=sd(erbF1, na.rm=T), 
-  	meanf2 = mean(erbF2, na.rm=T), sdf2=sd(erbF2, na.rm=T), 
-  	count=length(vowel))
+  	meanf1 = mean(erbF1, na.rm = T), sdf1 = sd(erbF1, na.rm = T), 
+  	meanf2 = mean(erbF2, na.rm = T), sdf2=sd(erbF2, na.rm = T), 
+  	count = length(vowel))
   	
-  	vowelInfo[[i]]$meanf1plusSD <- vowelInfo[[i]]$meanf1+2*vowelInfo[[i]]$sdf1
-  	vowelInfo[[i]]$meanf1minSD <- vowelInfo[[i]]$meanf1-2*vowelInfo[[i]]$sdf1
-  	vowelInfo[[i]]$meanf2plusSD <- vowelInfo[[i]]$meanf2+2*vowelInfo[[i]]$sdf2
-  	vowelInfo[[i]]$meanf2minSD <- vowelInfo[[i]]$meanf2-2*vowelInfo[[i]]$sdf2
+  	vowelInfo[[i]]$meanf1plusSD <- vowelInfo[[i]]$meanf1 + 2 * vowelInfo[[i]]$sdf1
+  	vowelInfo[[i]]$meanf1minSD <- vowelInfo[[i]]$meanf1 - 2 * vowelInfo[[i]]$sdf1
+  	vowelInfo[[i]]$meanf2plusSD <- vowelInfo[[i]]$meanf2 + 2 * vowelInfo[[i]]$sdf2
+  	vowelInfo[[i]]$meanf2minSD <- vowelInfo[[i]]$meanf2 - 2 * vowelInfo[[i]]$sdf2
 }
 
 # merge these numbers with the main list
 for (i in 1:length(vowelInfo)) {
- 	langDFs[[i]] <- left_join(langDFs[[i]], vowelInfo[[i]], by="vowel")
+ 	langDFs[[i]] <- left_join(langDFs[[i]], vowelInfo[[i]], by = "vowel")
 }
 
 # remove outliers	
@@ -322,10 +322,10 @@ for (i in 1:length(nodata)) {
 
 # count remaining vowels
 count <- getNumVowels(langDFs, "outlier_after")
-numVowels <- left_join(numVowels, count, by="lang")
+numVowels <- left_join(numVowels, count, by = "lang")
 
-numVowels$retained_mcd <- numVowels$utt_mcd/numVowels$orig
-numVowels$retained_total <- numVowels$outlier_after/numVowels$orig
+numVowels$retained_mcd <- numVowels$utt_mcd / numVowels$orig
+numVowels$retained_total <- numVowels$outlier_after / numVowels$orig
 numVowels$retained_mcd <- ifelse(numVowels$retained_mcd < 0.01, "NA", numVowels$retained_mcd)
 numVowels$retained_mcd <- as.numeric(as.character(numVowels$retained_mcd))
 
@@ -336,7 +336,7 @@ summary(numVowels)
 ### SAVE RETENTION STATS ###
 ############################
 
-print(xtable(numVowelsTable), file=paste0(outputDir, DATASET, "-retention-vowels.tex"))
+print(xtable(numVowelsTable), file = paste0(outputDir, DATASET, "-retention-vowels.tex"))
 write_csv(numVowels, paste0(outputDir, DATASET, "-retention-vowels-all.csv"))
 
 ##########################################
@@ -348,21 +348,21 @@ vowelFreqs <- list()
 
 for (i in 1:length(langDFs)) {
   	langID <- names(langDFs[i])
-  	vowelFreqs[[langID]] <- langDFs[[langID]] %>% group_by(vowel) %>% summarise(count=length(vowel))
+  	vowelFreqs[[langID]] <- langDFs[[langID]] %>% group_by(vowel) %>% summarise(count = length(vowel))
   	vowelFreqs[[langID]]$total <- sum(vowelFreqs[[langID]]$count)
-  	vowelFreqs[[langID]]$prop <- vowelFreqs[[langID]]$count/vowelFreqs[[langID]]$total
+  	vowelFreqs[[langID]]$prop <- vowelFreqs[[langID]]$count / vowelFreqs[[langID]]$total
   	vowelFreqs[[langID]]$logprop <- log(vowelFreqs[[langID]]$prop)
   	vowelFreqs[[langID]]$lang <- langID
 }
 
 df.vowelFreqs <- do.call(rbind.data.frame, vowelFreqs)
     
-nVowels <- df.vowelFreqs %>% group_by(lang) %>% summarise(count=length(vowel))
+nVowels <- df.vowelFreqs %>% group_by(lang) %>% summarise(count = length(vowel))
 	
 for (i in 1:length(langDFs)) {
-  	removeCols <- which(names(langDFs[[i]]) %in% c('count', 'meanf1plusSD', 'meanf1minSD', 'meanf2plusSD','meanf2minSD'))
+  	removeCols <- which(names(langDFs[[i]]) %in% c("count", "meanf1plusSD", "meanf1minSD", "meanf2plusSD", "meanf2minSD"))
   	langDFs[[i]] <- langDFs[[i]][,-removeCols]
-  	langDFs[[i]] <- left_join(langDFs[[i]], vowelFreqs[[i]], by="vowel")
+  	langDFs[[i]] <- left_join(langDFs[[i]], vowelFreqs[[i]], by = "vowel")
 }
 
 ###########################################################
@@ -373,8 +373,8 @@ if (SAVE_SURPRISAL_INPUT == TRUE) {
     for (i in 1:length(langDFs)) {
         lang <- langDFs[[i]]
         langid <- names(langDFs[i])
-        langtmp <- lang[,-which(colnames(lang)%in%c("start", "end", "language", "code", "MCD0", "MCD1", "genus", "family", "macroarea"))]
-        write.csv(langtmp, paste0(surprisalDir, langid, "_formants_mid_fin.csv"), quote=F, row.names=F)
+        langtmp <- lang[,-which(colnames(lang) %in% c("start", "end", "language", "code", "MCD0", "MCD1", "genus", "family", "macroarea"))]
+        write.csv(langtmp, paste0(surprisalDir, langid, "_formants_mid_fin.csv"), quote = F, row.names = F)
     	}
 }
 
@@ -388,22 +388,22 @@ for (i in 1:length(langDFs)) {
   langID <- names(langDFs[i])  
   meansPerVowelPerLang[[langID]] <- langDFs[[langID]] %>% group_by(vowel) %>% summarise(
   mean_f1 = mean(erbF1), mean_f2 = mean(erbF2), mean_dur = mean(dur), 
-  sd_f1 = sd(erbF1), sd_f2 = sd(erbF2), sd_dur = sd(dur), lang=langID, family=family[1])
+  sd_f1 = sd(erbF1), sd_f2 = sd(erbF2), sd_dur = sd(dur), lang = langID, family = family[1])
 }
 
 myMeans <- do.call(rbind.data.frame, meansPerVowelPerLang)
-myMeans <- left_join(myMeans, df.vowelFreqs, by=c("lang", "vowel"))
+myMeans <- left_join(myMeans, df.vowelFreqs, by = c("lang", "vowel"))
 
 ##############################
 ### SAVE IMPORTANT NUMBERS ###
 ##############################
 
-formantNumbers <- matrix(ncol=1, nrow=11)
+formantNumbers <- matrix(ncol = 1, nrow = 11)
 formantNumbers[1,1] <- length(langDFs) # number readings
 formantNumbers[2,1] <- sum(vowelFreqs$count) # total number of vowels
 
 # of vowels per language + average
-vowelsPerLang <- vowelFreqs %>% group_by(lang) %>% summarise(count=sum(count))
+vowelsPerLang <- vowelFreqs %>% group_by(lang) %>% summarise(count = sum(count))
 summary(vowelsPerLang)
 
 formantNumbers[3,1] <- mean(vowelsPerLang$count)
@@ -424,7 +424,7 @@ formantNumbers$description <- c("# langs", "total # vowels", "mean # per lang", 
 formantNumbers <- formantNumbers %>% select(description, formantNumbers)
 
 # counts of languages per vowel category
-counts <- myMeans %>% group_by(vowel) %>% summarise(count=length(lang)) %>% arrange(desc(count))
+counts <- myMeans %>% group_by(vowel) %>% summarise(count = length(lang)) %>% arrange(desc(count))
 head(counts)
 
 # language family count
@@ -434,12 +434,12 @@ langFamilies <- inventory %>% filter(lang %in% myMeans$lang) %>% group_by(family
 langs <- names(langDFs)
 inv <- filter(inventory, lang %in% langs)
 
-write.csv(nVowels, paste0(outDir, "nVowelCategories_", DATASET, ".csv"), quote=F, row.names=F)
-write.table(formantNumbers, paste0(outDir, "formantNumbers_", DATASET, ".txt"), quote=F, sep="\t")
-write.csv(vowelsPerLang, paste0(outDir, "nVowelTokens_", DATASET, ".csv"), quote=F, row.names=F)
-write.csv(counts, paste0(outDir, "vowelFrequencies_", DATASET, ".csv"), quote=F, row.names=F)
-write.csv(langFamilies, paste0(outDir, "langFamilies_", DATASET, ".csv"), quote=F, row.names=F)
-write.csv(inv, paste0(outDir,"vowel_langs.csv"), row.names=F)
+write.csv(nVowels, paste0(outDir, "nVowelCategories_", DATASET, ".csv"), quote = F, row.names = F)
+write.table(formantNumbers, paste0(outDir, "formantNumbers_", DATASET, ".txt"), quote = F, sep = "\t")
+write.csv(vowelsPerLang, paste0(outDir, "nVowelTokens_", DATASET, ".csv"), quote = F, row.names = F)
+write.csv(counts, paste0(outDir, "vowelFrequencies_", DATASET, ".csv"), quote = F, row.names = F)
+write.csv(langFamilies, paste0(outDir, "langFamilies_", DATASET, ".csv"), quote = F, row.names = F)
+write.csv(inv, paste0(outDir,"vowel_langs.csv"), row.names = F)
 
 ##################################
 ### GET CORRELATIONS BTW MEANS ###
@@ -450,10 +450,10 @@ f1 <- vowelValues(myMeans, mean_f1)
 f2 <- vowelValues(myMeans, mean_f2)
 
 # count up the number of times each vowel pair occurs across readings
-vowelCount1 <- myMeans %>% group_by(lang, vowel) %>% summarise(count=length(vowel))
+vowelCount1 <- myMeans %>% group_by(lang, vowel) %>% summarise(count = length(vowel))
 vowelCount2 <- vowelCount1
-vowelCooccur <- merge(vowelCount1, vowelCount2, by="lang")
-vowelCooccur <- vowelCooccur %>% group_by(vowel.x, vowel.y) %>% summarise(count=length(vowel.x))
+vowelCooccur <- merge(vowelCount1, vowelCount2, by = "lang")
+vowelCooccur <- vowelCooccur %>% group_by(vowel.x, vowel.y) %>% summarise(count = length(vowel.x))
 
 # get correlations
 f1.cors <- getCors(f1, 3)
@@ -472,8 +472,8 @@ f2.cors.latex <- latexCors(f2.cors, 9)
 ###############################
 
 # still saving as csv because of mismatching number of significant digits; post-process elsewhere
-write.csv(f1.cors.latex, file=paste0(outDir, "f1cors_", DATASET,".csv"), row.names=F, quote=F)
-write.csv(f2.cors.latex, file=paste0(outDir, "f2cors_", DATASET,".csv"), row.names=F, quote=F)
+write.csv(f1.cors.latex, file=paste0(outDir, "f1cors_", DATASET,".csv"), row.names = F, quote = F)
+write.csv(f2.cors.latex, file=paste0(outDir, "f2cors_", DATASET,".csv"), row.names = F, quote = F)
 
 ####################
 ### MAKE FIGURES ###
