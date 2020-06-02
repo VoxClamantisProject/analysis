@@ -245,7 +245,7 @@ for (i in 1:length(langDFs)) {
   	# merge formants with utterance-level scores
   	langDFs[[langID]] <- left_join(langDFs[[langID]], scores[[langID]], by=c("file"="file"))
   	
-  	# merge formants with wilderness inventory data
+  	# merge formants with wilderness inventory data (reading_info.csv)
     langDFs[[langID]] <- left_join(langDFs[[langID]], inventory, by="lang")
 }
 
@@ -264,7 +264,7 @@ numVowels <- getNumVowels(langDFs, "orig")
 
 # prep readings with MCD > 8 for removal
 removeme <- inventory$lang[which(inventory$MCD1 > 8)]
-removeme <- removeme[names(langDFs) %in% removeme]
+removeme <- removeme[removeme %in% names(langDFs)]
 
 # remove files above file-mcd cutoff
 for (i in 1:length(removeme)) {
@@ -483,7 +483,7 @@ f1.iu <- prepFigure(myMeans, f1, sd_f1, "i", "u")
 
 cor.test(~i + u, f1)
 
-pdf(paste0(outputDir, "wilderness_iu_F1_ellipse_ERB_", DATASET, ".pdf"))
+pdf(paste0(outputDir, "voxclamantis_iu_F1_ellipse_ERB_", DATASET, ".pdf"))
 makeFigure(f1.iu, "F1 /i/", "F1 /u/", "r = 0.79, p < 0.001", TRUE) 
 dev.off()
 
