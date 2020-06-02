@@ -170,7 +170,7 @@ makeFigure <- function(prep_figure_data, label1, label2, corInfo, uniformityFigu
 	minY <- round(min(y, na.rm = T))
 	maxY <- ceiling(max(y, na.rm = T))
 
-	if (uniformityFigure==TRUE) {
+	if (uniformityFigure == TRUE) {
 		minX <- minY <- min(minX, minY)
 		maxX <- maxY <- max(maxX, maxY)
 	}
@@ -199,9 +199,9 @@ makeFigure <- function(prep_figure_data, label1, label2, corInfo, uniformityFigu
 ######## READ IN DATA ########
 ##############################
 
+scores_list <- list.files(path = scoresDir, pattern = "*.scores")
 epi_list <- list.files(path = epiDir, pattern = "*_mid.csv")
 wiki_list <- list.files(path = wikiDir, pattern = "*_mid.csv")
-scores_list <- list.files(path = scoresDir, pattern = "*.scores")
 
 # READ IN PER-UTT-MCD SCORES
 

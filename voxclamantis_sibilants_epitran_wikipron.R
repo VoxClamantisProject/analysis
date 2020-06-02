@@ -42,24 +42,24 @@ readSibFiles <- function(fileDir, file_list) {
 	d <- read_csv(paste0(fileDir, file_list[i]))
 	d$erbfreq <- hz2erb(d$peak3k7k)
 	d$stim <- NULL
-    
-    sibinfo <- gsub("sibilants.csv", "sibInfo.csv", file_list[i])
-    d2 <- read_csv(paste0(fileDir, sibinfo))
-    d <- left_join(d, d2, by = c("file", "trial", "sib"))
-    d <- left_join(d, inventory, by = "lang")
-    d <- d %>% select(c(file, sib, lang), everything())  
-    return(d)  
+	
+	sibinfo <- gsub("sibilants.csv", "sibInfo.csv", file_list[i])
+	d2 <- read_csv(paste0(fileDir, sibinfo))
+	d <- left_join(d, d2, by = c("file", "trial", "sib"))
+	d <- left_join(d, inventory, by = "lang")
+	d <- d %>% select(c(file, sib, lang), everything())  
+	return(d)  
 }
 
 # remove non-sibilants: only necessary for unitran
 removeNonSibs <- function(x) {
-	x <- filter(x, !sib %in% c('SIL', 'SHADDA', 'SOFTSIGN', 'SEMICOLON', 'SIX'))
+	x <- filter(x, !sib %in% c("SIL", "SHADDA", "SOFTSIGN", "SEMICOLON", "SIX"))
 	return(x)
 }
 
-# only keep 's' and 'z' sibilants
+# only keep "s" and "z" sibilants
 keepSZ <- function(x) {
-	x <- filter(x, sib %in% c('s','z'))
+	x <- filter(x, sib %in% c("s","z"))
 	return(x)
 }
 
@@ -95,9 +95,9 @@ removeOutliers <- function(x) {
 ### READ IN DATA ###
 ####################
 
+scores_list <- list.files(path = scoresDir, pattern = "*.scores")
 epi_list <- list.files(path = epiDir, pattern = "*sibilants.csv")
 wiki_list <- list.files(path = wikiDir, pattern = "*sibilants.csv")
-scores_list <- list.files(path = scoresDir, pattern = "*.scores")
 
 # READ IN PER-UTT-MCD SCORES
 
@@ -137,7 +137,7 @@ langDFs_orig <- langDFs
 ######## OUTLIER EXCLUSION ########	     
 ###################################
 
-# only keep 's' and 'z' sibilants
+# only keep "s" and "z" sibilants
 langDFs <- lapply(langDFs, keepSZ)
 
 # remove languages w/o /s/ *and* /z/
@@ -146,7 +146,7 @@ lessThanTwo <- names(numSibCats[which(numSibCats < 2)])
 	
 for (i in 1:length(lessThanTwo)) {
 	langDFs[[lessThanTwo[i]]] <- NULL
-	}
+}
 
 # count number of sibilants
 numSibs <- getNumSibs(langDFs, "orig")
@@ -184,7 +184,7 @@ for (i in 1:length(langDFs)) {
 	sibInfo[[i]]$meandurplusSD <- sibInfo[[i]]$meandur + 2 * sibInfo[[i]]$sddur
 	sibInfo[[i]]$meandurminSD <- sibInfo[[i]]$meandur - 2 * sibInfo[[i]]$sddur
 	
-    langDFs[[langID]] <- left_join(langDFs[[langID]], sibInfo[[langID]], by = c('lang', 'sib'))
+    langDFs[[langID]] <- left_join(langDFs[[langID]], sibInfo[[langID]], by = c("lang", "sib"))
 }
 
 # remove outliers
@@ -281,7 +281,7 @@ scale_max <- 31
 diff <- scale_max - scale_min
 
 p <- ggplot(peak.sz, aes(x = s, y = z)) + geom_point(size = 0, color = "slategray", alpha = 0) + 
-	geom_ellipse(aes(x0 = s, y0 = z, a = sd_s * 0.1, b = sd_z * 0.1, angle = 0), color = "slategray",fill = "slategray",alpha = 0.04) + 
+	geom_ellipse(aes(x0 = s, y0 = z, a = sd_s * 0.1, b = sd_z * 0.1, angle = 0), color = "slategray", fill = "slategray", alpha = 0.04) + 
 	geom_smooth(method = lm, size = 0.75, se = TRUE, color = "black") + 
 	geom_abline(slope = 1, intercept = 0, linetype = "dashed", alpha = 0.4) + 
 	theme_few(20) + xlab("ERB") + ylab("ERB") + 
