@@ -8,14 +8,14 @@
 
 # If SAVE_SURPRISAL_INPUT is set to TRUE, it also saves the a text file for each reading that serves as input to the Dispersion analysis in the wilderness-analysis-master Python scripts
 
-require(tidyverse)
-require(reshape2)
-require(xtable)
-require(data.table)
-require(jsonlite)
-require(ggthemes)
-require(ggExtra)
-require(ggforce)
+library(tidyverse)
+library(reshape2)
+library(xtable)
+library(data.table)
+library(jsonlite)
+library(ggthemes)
+library(ggExtra)
+library(ggforce)
 
 #################
 ### CHANGE ME ###

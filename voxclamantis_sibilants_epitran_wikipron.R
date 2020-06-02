@@ -11,8 +11,8 @@ library(ggExtra)
 library(ggthemes)
 library(ggforce)
 library(jsonlite)
-require(data.table)
-require(xtable)
+library(data.table)
+library(xtable)
 
 #################
 ### CHANGE ME ###
