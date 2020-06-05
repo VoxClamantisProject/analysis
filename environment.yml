@@ -1,0 +1,10 @@
+name: wild
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.7
+  - numpy
+  - pandas
+  - scikit-learn
+  - tqdm
